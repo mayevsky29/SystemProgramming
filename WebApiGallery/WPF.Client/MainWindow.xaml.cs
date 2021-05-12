@@ -23,7 +23,7 @@ namespace WPF.Client
     {
         public MainWindow()
         {
-            String URI = "https://vpu911.ga/api/Girls/search";
+            String URI = "https://localhost:44396/api/Girls/search";
             WebClient webClient = new WebClient();
             string reply = webClient.DownloadString(URI);
 
