@@ -1,0 +1,21 @@
+dotnet WebApiGallery.dll
+dotnet WebApiGallery.dll --urls=https://localhost:7870
+
+dotnet ProjectWebApi.dll --urls=https://localhost:7875
+
+sudo systemctl enable webapi911.pp.ua.service
+
+sudo systemctl start webapi911.pp.ua.service
+sudo systemctl status webapi911.pp.ua.service
+
+cat /etc/lsb-release    перевірко версії ОС
+
+
+
+sudo cp -r /vagrant/output/* /var/www/webapi911.pp.ua
+sudo cp -r /vagrant/nginx/default /etc/nginx/sites-available/default
+
+
+
+/var/www/webapi911.pp.ua
+налаштування nginx
