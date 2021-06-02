@@ -1,7 +1,15 @@
 dotnet WebApiGallery.dll
 dotnet WebApiGallery.dll --urls=https://localhost:7870
 
+dotnet WebGallery.dll
+dotnet WebGallery.dll --urls=http://localhost:7272
+
+
+
 dotnet ProjectWebApi.dll --urls=https://localhost:7875
+
+dotnet WebGallery.dll --urls=https://localhost:7575
+
 
 sudo systemctl enable webapi911.pp.ua.service
 
@@ -14,6 +22,40 @@ cat /etc/lsb-release    перевірко версії ОС
 
 sudo cp -r /vagrant/output/* /var/www/webapi911.pp.ua
 sudo cp -r /vagrant/nginx/default /etc/nginx/sites-available/default
+
+
+
+
+Запуск сайта dotnet dotnet FastFood.WebApi.dll
+Треба стоврити сервіс де воно саме буде запускати додаток
+sudo nano /etc/systemd/system/webapi911.pp.ua.service
+
+[Unit]
+Description=webapi911
+
+[Service]
+WorkingDirectory=/WebApi911Async/WebGallery/bin/Release/netcoreapp3.1/publish
+ExecStart=/usr/bin/dotnet WebGallery.dll
+Restart=always
+# Restart service after 10 seconds if the dotnet service crashes:
+RestartSec=10
+KillSignal=SIGINT
+SyslogIdentifier=dotnet-example
+User=root
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
+
+[Install]
+WantedBy=multi-user.target
+
+sudo systemctl enable webapi911.pp.ua.service
+sudo systemctl start webapi911.pp.ua.service
+sudo systemctl status webapi911.pp.ua.service
+sudo systemctl stop webapi911.pp.ua.service
+
+systemctl daemon-reload
+
+
 
 
 

@@ -2,8 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using UIHelper;
 using WebApiGallery.Entities;
 using WebApiGallery.Entities.Data;
 using WebApiGallery.Models;
@@ -32,8 +35,14 @@ namespace WebApiGallery.Controllers
         [Route("add")]
         public IActionResult AddCar([FromBody] Car car)
         {
-            _context.Cars.Add(car);
-            _context.SaveChanges();
+            //_context.Cars.Add(car);
+            //_context.SaveChanges();
+            var dir = Directory.GetCurrentDirectory();
+            var dirSave = Path.Combine(dir, "uploads");
+            var imageName = Path.GetRandomFileName() + ".jpg";
+            var imageSaveFolder = Path.Combine(dirSave, imageName);
+            var image = car.Image.LoadBase64();
+            image.Save(imageSaveFolder, ImageFormat.Jpeg);
             return Ok(new { message = "Додано" });
         }
 

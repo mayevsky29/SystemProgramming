@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Win32;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,81 +18,79 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using UIHelper;
+using WPF.Client;
 using WPF.Client.Models.CarValidation;
 
-namespace WPF.Client
+namespace Wpf.Client
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
+        private string file_selected = string.Empty;
+        public string file_name { get; set; }
+        public static string New_FileName { get; set; }
+        //private readonly IConfiguration _configuration;
         public MainWindow()
         {
-           //Thread.Sleep(3000);
-                                   
-            // створення запиту за допомогою URL-адреси, на яку можна отримати публікацію
-            WebRequest request = WebRequest.Create("http://localhost:5000/api/cars/add");
-     
-            // встановлення для властивості метод запиту POST
-            request.Method = "POST";
+            //_configuration = configuration;
+            InitializeComponent();
+        }
 
-            // створення даних POST і перетворення їх у байтовий масив
-            string postData = JsonConvert.SerializeObject(new
+        private void btnSelectImage_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Image files (*.png;*.jpeg;*.jpg)|*.png;*.jpeg;*.jpg|All files (*.*)|*.*";
+            if (openFileDialog.ShowDialog() == true)
             {
-                //Mark = "Ford",
-                //Model = "Биток із США",
-                Year = 2020,
-                Fuel = "Брикет РУФ",
-                Сapacity = 5.7F,
-                Image = "2021-Ford-Th999underbird-Rebord.jpg"
+                New_FileName = openFileDialog.FileName;
+            }
+        }
+
+        private async void btnSaveChangs_Click(object sender, RoutedEventArgs e)
+        {
+            await Task.Run(() => PostRequest());
+        }
+
+        public async Task<bool> PostRequest()
+        {
+
+            //New_FileName
+            var app = App.Current as IGetConfiguration;
+            var serverUrl = app.Configuration.GetSection("ServerUrl").Value;
+            WebRequest request = WebRequest.Create($"{serverUrl}api/Cars/add");
+            {
+                request.Method = "POST";
+                request.ContentType = "application/json";
+            };
+            string base64 = ImageHelper.ImageConvertToBase64(New_FileName);
+            string json = JsonConvert.SerializeObject(new
+            {
+                Mark = "Камаз", //tbMark.Text.ToString(),
+                Model = "34", //tbModel.Text.ToString(),
+                Year = 1975, //int.Parse(tbYear.Text),
+                Fuel = "Дизель", //tbFuel.Text.ToString(),
+                Capacity = 12.45F, //float.Parse(tbСapacity.Text),
+                Image = base64
             });
-            byte[] byteArray = Encoding.UTF8.GetBytes(postData);
+            byte[] bytes = Encoding.UTF8.GetBytes(json);
 
-            // Set the ContentType property of the WebRequest.
-            request.ContentType = "application/json";
-            // Set the ContentLength property of the WebRequest.
-            //request.ContentLength = byteArray.Length;
-
-            // отримання потоку запитів
-            Stream dataStream = request.GetRequestStream();
-            
-            // запис данних до потоку запитів
-            dataStream.Write(byteArray, 0, byteArray.Length);
-            // Close the Stream object.
-            dataStream.Close();
-
+            using (Stream stream = await request.GetRequestStreamAsync())
+            {
+                stream.Write(bytes, 0, bytes.Length);
+            }
             try
             {
-                // отримання відповіді від запиту
-                WebResponse response = request.GetResponse();
-                // відображення стану
-                Console.WriteLine(((HttpWebResponse)response).StatusDescription);
-
-                // отримання потоку, який має дані отримані з сервера
-                // блок який використовується, забезпечує автоматичне закриття потоку
-                using (dataStream = response.GetResponseStream())
-                {
-                    // Відкриття потоку за допомогою StreamReader
-                    StreamReader reader = new StreamReader(dataStream);
-                    
-                    // читання данних з сервера
-                    string responseFromServer = reader.ReadToEnd();
-                    // Display the content.
-                    Console.WriteLine(responseFromServer);
-                }
-
-                // Close the response.
-                response.Close();
+                await request.GetResponseAsync();
+                return true;
             }
-
             catch (WebException e)
             {
-               // виняток дає можливість дізнатися причину помилки
                 using (WebResponse response = e.Response)
                 {
                     HttpWebResponse httpResponse = (HttpWebResponse)response;
-                    
                     MessageBox.Show("Error code: " + httpResponse.StatusCode);
                     using (Stream data = response.GetResponseStream())
                     using (var reader = new StreamReader(data))
@@ -99,17 +99,19 @@ namespace WPF.Client
                         var errors = JsonConvert.DeserializeObject<AddCarValidation>(text);
                         MessageBox.Show(text);
                         MessageBox.Show(errors.Errors.Mark[0]);
+                        MessageBox.Show(errors.Errors.Model[0]);
+                        MessageBox.Show(errors.Errors.Year[0]);
+                        MessageBox.Show(errors.Errors.Fuel[0]);
+                        return false;
                     }
                 }
             }
-
             catch (Exception ex)
             {
-
-                MessageBox.Show(ex.Message);
+                MessageBox.Show(ex.Message.ToString());
+                return false;
             }
-
-            InitializeComponent();
         }
+
     }
 }

@@ -22,52 +22,52 @@ namespace WebApiGallery
                 var userManager = serviceScope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
                 var context = serviceScope.ServiceProvider.GetRequiredService<EFDataContext>();
 
-                if (!roleManager.Roles.Any())
-                {
-                    var role = new AppRole
-                    {
-                        Name = Roles.Admin
-                    };
-                    var result = roleManager.CreateAsync(role).Result;
-                }
+                //if (!roleManager.Roles.Any())
+                //{
+                //    var role = new AppRole
+                //    {
+                //        Name = Roles.Admin
+                //    };
+                //    var result = roleManager.CreateAsync(role).Result;
+                //}
 
-                if (!context.Cars.Any())
-                {
-                    var cars = new List<Car>()
-                    {
-                        new Car
-                        {
-                            Mark = "Ford",
-                            Model="Thunderbird",
-                            Year=2021,
-                            Fuel = "Бензин",
-                            Сapacity=5.7F,
-                            Image="2021-Ford-Thunderbird-Rebord.jpg"
-                        },
-                        new Car
-                        {
-                            Mark = "Tesla",
-                            Model="ModelX",
-                            Year=2021,
-                            Fuel = "Електро",
-                            Сapacity=0.0F,
-                            Image="tesla-model-x-2021.jpg"
-                        },
-                        new Car
-                        {
-                            Mark = "Audi",
-                            Model="Q8",
-                            Year=2021,
-                            Fuel = "Бензин",
-                            Сapacity=4.2F,
-                            Image="Q8.jpg"
-                        }
-                    };
-                    context.Cars.AddRange(cars);
-                    context.SaveChanges();
+                //if (!context.Cars.Any())
+                //{
+                //    var cars = new List<Car>()
+                //    {
+                //        new Car
+                //        {
+                //            Mark = "Ford",
+                //            Model="Thunderbird",
+                //            Year=2021,
+                //            Fuel = "Бензин",
+                //            Сapacity=5.7F,
+                //            Image="2021-Ford-Thunderbird-Rebord.jpg"
+                //        },
+                //        new Car
+                //        {
+                //            Mark = "Tesla",
+                //            Model="ModelX",
+                //            Year=2021,
+                //            Fuel = "Електро",
+                //            Сapacity=0.0F,
+                //            Image="tesla-model-x-2021.jpg"
+                //        },
+                //        new Car
+                //        {
+                //            Mark = "Audi",
+                //            Model="Q8",
+                //            Year=2021,
+                //            Fuel = "Бензин",
+                //            Сapacity=4.2F,
+                //            Image="Q8.jpg"
+                //        }
+                //    };
+                //    context.Cars.AddRange(cars);
+                //    context.SaveChanges();
                 }
 
             }
         }
     }
-}
+
